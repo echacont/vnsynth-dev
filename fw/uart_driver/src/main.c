@@ -1,17 +1,14 @@
-#include "defines.h"
+#include "rvfpganexys.h"
+#include <uart.h>
+#include <interrupts.h>
 
-extern "C" void uart_init(void);
-extern "C" void uart_putc(unsigned char);
-extern "C" unsigned char uart_getc(void);
-
-void uart_puts(char* str) {
-  while (*str) uart_putc(*str++);
-  uart_putc('\n');
-}
 
 int main() {
 
   WRITE_REG(SegEn_ADDR, 0xFC);
+
+  // INITIALIZE THE INTERRUPT SYSTEM
+  DefaultInitialization();
 
   uart_init();
   //uart_putc(13);

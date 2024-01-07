@@ -68,11 +68,11 @@ _uart_get_end:
 
 uart_putc:
     li  t0, UART_BASE
-    uartSendByte:
+_uartSendByte:
     /* Check for space in UART FIFO */ 
     lb t1, REG_LSR(t0)
     andi t1, t1, LSR_THRE
-    beqz t1, uartSendByte
+    beqz t1, _uartSendByte
     
     # store character at UART address in return register
     sb  a0, (t0)
