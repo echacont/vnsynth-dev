@@ -10,14 +10,9 @@ extern unsigned char uart_getc(void);
 extern unsigned int  uart_geti(void);
 extern void uart_clear(void);
 extern unsigned int uart_status(); 
+extern unsigned int uart_msr();
 extern unsigned int uart_iir();
 extern void uart_int_enable();
 extern void uart_int_disable();
-    
-
-void uart_puts(char* str) {
-  while (*str) uart_putc(*str++);
-  uart_putc('\n');
-}
 
 #endif // UART_H

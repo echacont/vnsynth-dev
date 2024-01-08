@@ -8,27 +8,29 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/include",
-                "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/src",
-                "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/lib/uart",
-                "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/lib/interrupts",
-                "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/common/api_inc",
-                "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/psp/api_inc",
-                "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1",
-                "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1/bsp",
+                "/Users/elecha/src/vnsynth-dev/fw/uart_driver/include",
+                "/Users/elecha/src/vnsynth-dev/fw/uart_driver/src",
+                "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/interrupts",
+                "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/uart",
+                "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/common/api_inc",
+                "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/psp/api_inc",
+                "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1",
+                "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1/bsp",
+                "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/midi",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/include",
-                    "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/src",
-                    "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/lib/uart",
-                    "/home/elecha/Digitales/work/snsynth-dev/fw/uart_driver/lib/interrupts",
-                    "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/common/api_inc",
-                    "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/psp/api_inc",
-                    "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1",
-                    "/home/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1/bsp",
+                    "/Users/elecha/src/vnsynth-dev/fw/uart_driver/include",
+                    "/Users/elecha/src/vnsynth-dev/fw/uart_driver/src",
+                    "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/interrupts",
+                    "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/uart",
+                    "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/common/api_inc",
+                    "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/psp/api_inc",
+                    "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1",
+                    "/Users/elecha/.platformio/packages/framework-wd-riscv-sdk/board/nexys_a7_eh1/bsp",
+                    "/Users/elecha/src/vnsynth-dev/fw/uart_driver/lib/midi",
                     ""
                 ]
             },
@@ -56,7 +58,7 @@
                 "sys/cdefs.h",
                 ""
             ],
-            "compilerPath": "/home/elecha/.platformio/packages/toolchain-riscv/bin/riscv64-unknown-elf-gcc",
+            "compilerPath": "/Users/elecha/.platformio/packages/toolchain-riscv/bin/riscv64-unknown-elf-gcc",
             "compilerArgs": [
                 "-march=rv32imac",
                 "-mabi=ilp32",

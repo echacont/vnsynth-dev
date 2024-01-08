@@ -8,8 +8,8 @@
 #include "psp_api.h"
 #include "bsp_external_interrupts.h"
 #include "psp_ext_interrupts_eh1.h"
-
-
+// include UART library
+#include <uart.h>
 
 extern D_PSP_DATA_SECTION D_PSP_ALIGNED(1024) pspInterruptHandler_t G_Ext_Interrupt_Handlers[8];
 
@@ -23,8 +23,12 @@ void ExternalIntLine_Initialization(u32_t uiSourceId, u32_t priority, pspInterru
 
 // interrupts
 // main wrapper
-//void interrupt_init(void);
-//void GPIO_ISR(void);
-//void PTC_ISR(void);
+void interrupt_init(void);
+void GPIO_ISR(void);
+void PTC_ISR(void);
+
+void GPIO_Initialization(void);
+void PTC_Initialization(void);
+void SevenSegments_Initialization(void);
 
 #endif // INTERRUPTS_H
