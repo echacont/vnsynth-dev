@@ -25,6 +25,7 @@ int main() {
   M_PSP_WRITE_REGISTER_32(SegDig_ADDR, 0x0); 
 
   interrupt_init();
+  uart_int_enable();
 
   for (;;) {
     //char c = uart_getc();
@@ -54,25 +55,52 @@ void interrupt_init(void)
 
 void UART_ISR(void)
 {
+  uart_int_disable();
   //static unsigned int i = 0;
-  //M_PSP_WRITE_REGISTER_32(SegDig_ADDR, i);
   //i++;
-  // clear interrupt
-  //char c = uart_getc();
-  char c;
+  //M_PSP_WRITE_REGISTER_32(SegDig_ADDR, i);
+  char c; // = uart_getc();
+  unsigned int c0, c1, c2, c3;
   unsigned int interrupt_id = uart_iir();
-  M_PSP_WRITE_REGISTER_32(SegDig_ADDR, interrupt_id);
+  M_PSP_WRITE_REGISTER_32(GPIO_LEDs, interrupt_id);
   switch(interrupt_id)
   {
-      case 0xCC:
+      case 0xC1: // modem status
+          uart_msr();
           c = uart_getc();
           break;
+
+      case 0xCC: // timeout indication
+          c = uart_getc();
+          //c1 = uart_geti();
+          //c2 = uart_geti();
+          //c3 = uart_geti();
+  //M_PSP_WRITE_REGISTER_32(SegDig_ADDR, c0 | c1<<8 | c2<<16 | c3<<24);
+          break;
       default:
+          M_PSP_WRITE_REGISTER_32(GPIO_LEDs, interrupt_id);
           break;
   }
-  M_PSP_WRITE_REGISTER_32(SegDig_ADDR, c);
-  //uart_clear();
+
+  // MIDI stuff
+  static int byte = 0;
+  static int ump = 0;
+  ump = ump | c;
+  if (byte < 3) 
+    ump = ump<<8;
+  byte++;
+  if (byte == 4) // 4 bytes have been received.
+  { 
+    byte = 0;
+    M_PSP_WRITE_REGISTER_32(SegDig_ADDR, ump);
+    // call function to handle MIDI message
+    
+  }
+  
+  
+
   bspClearExtInterrupt(1);
+  uart_int_enable();
 }
 
 void GPIO_ISR(void)
@@ -109,8 +137,8 @@ void PTC_ISR(void)
   //M_PSP_WRITE_REGISTER_32(SegDig_ADDR, i);
   //i++;
 
-  unsigned int lsr = uart_status();
-  M_PSP_WRITE_REGISTER_32(GPIO_LEDs, lsr);
+  //unsigned int lsr = uart_status();
+  //M_PSP_WRITE_REGISTER_32(GPIO_LEDs, lsr);
   /* Modify IRQ3 priority if SegDisplCount>10 */
   //if (SegDisplCount>10) pspExtInterruptSetPriority(3,5);
 

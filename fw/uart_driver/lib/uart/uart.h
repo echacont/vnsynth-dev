@@ -4,12 +4,15 @@
 #ifndef UART_H
 #define UART_H
 
-extern  void uart_init(void);
-extern  void uart_putc(unsigned char);
-extern  unsigned char uart_getc(void);
-extern  void uart_clear(void);
-extern  unsigned int uart_status(); 
-extern  unsigned int uart_iir();
+extern void uart_init(void);
+extern void uart_putc(unsigned char);
+extern unsigned char uart_getc(void);
+extern unsigned int  uart_geti(void);
+extern void uart_clear(void);
+extern unsigned int uart_status(); 
+extern unsigned int uart_iir();
+extern void uart_int_enable();
+extern void uart_int_disable();
     
 
 void uart_puts(char* str) {
