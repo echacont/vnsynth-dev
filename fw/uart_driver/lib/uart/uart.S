@@ -3,7 +3,9 @@
 .globl uart_init
 .globl uart_putc
 .globl uart_getc
-
+.globl uart_clear
+.globl uart_status
+.globl uart_iir
 
 #define UART_BASE 0x80002000
 #define REG_BRDL (4*0x00) /* Baud rate divisor (LSB) */ 
@@ -40,8 +42,9 @@ uart_init:
     /* Set the FIFO trigger level */
     li t1, FCR_FIFO | FCR_MODE0 | FCR_FIFO_8 | FCR_RCVRCLR | FCR_XMITCLR 
     sb t1, REG_FCR(t0)
-    /* disable interrupts */ 
-    sb zero, REG_IER(t0)
+    /* enable received data interrupt */
+    li t1, 1
+    sb t1, REG_IER(t0)
 
     ret
 
@@ -76,4 +79,20 @@ _uartSendByte:
     
     # store character at UART address in return register
     sb  a0, (t0)
+    ret
+
+uart_clear:
+    li  t0, UART_BASE
+    li  t1, FCR_RCVRCLR
+    sb  t1, REG_FCR(t0)
+    ret
+
+uart_status:
+    li  t0, UART_BASE
+    lw  a0, REG_LSR(t0)
+    ret
+
+uart_iir:
+    li  t0, UART_BASE
+    lw  a0, REG_FCR(t0)
     ret
