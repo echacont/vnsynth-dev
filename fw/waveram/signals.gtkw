@@ -1,0 +1,38 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Tue Jan  9 21:12:25 2024
+[*]
+[dumpfile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/.pio/build/swervolf_nexys/trace.vcd"
+[dumpfile_mtime] "Tue Jan  9 21:11:59 2024"
+[dumpfile_size] 58847844
+[savefile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/signals.gtkw"
+[timestart] 12404
+[size] 1393 766
+[pos] 182 206
+*-9.000000 13700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] rvfpgasim.
+[treeopen] rvfpgasim.swervolf.
+[sst_width] 214
+[signals_width] 243
+[sst_expanded] 1
+[sst_vpaned_height] 210
+@28
+rvfpgasim.swervolf.wavesynth0.i_clk
+rvfpgasim.swervolf.wavesynth0.i_reset
+rvfpgasim.swervolf.wavesynth0.i_wb_cyc
+@29
+rvfpgasim.swervolf.wavesynth0.i_wb_we
+@22
+rvfpgasim.swervolf.wavesynth0.i_wb_addr[5:0]
+rvfpgasim.swervolf.wavesynth0.i_wb_data[31:0]
+@200
+-
+@28
+rvfpgasim.swervolf.wavesynth0.wram_en
+rvfpgasim.swervolf.wavesynth0.wram_we
+@22
+rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
+rvfpgasim.swervolf.wavesynth0.wram_di[15:0]
+rvfpgasim.swervolf.wavesynth0.wram_dout[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

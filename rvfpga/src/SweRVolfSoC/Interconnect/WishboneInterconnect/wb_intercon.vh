@@ -87,6 +87,20 @@ wire        wb_s2m_ptc_ack;
 wire        wb_s2m_ptc_err;
 wire        wb_s2m_ptc_rty;
 
+// Synth 
+wire [31:0] wb_m2s_wavesynth_adr;
+wire [31:0] wb_m2s_wavesynth_dat;
+wire  [3:0] wb_m2s_wavesynth_sel;
+wire        wb_m2s_wavesynth_we;
+wire        wb_m2s_wavesynth_cyc;
+wire        wb_m2s_wavesynth_stb;
+wire  [2:0] wb_m2s_wavesynth_cti;
+wire  [1:0] wb_m2s_wavesynth_bte;
+wire [31:0] wb_s2m_wavesynth_dat;
+wire        wb_s2m_wavesynth_ack;
+wire        wb_s2m_wavesynth_err;
+wire        wb_s2m_wavesynth_rty;
+
 // SPI
 wire [31:0] wb_m2s_spi_accel_adr;
 wire [31:0] wb_m2s_spi_accel_dat;
@@ -190,6 +204,19 @@ wb_intercon wb_intercon0
     .wb_ptc_ack_i      (wb_s2m_ptc_ack),
     .wb_ptc_err_i      (wb_s2m_ptc_err),
     .wb_ptc_rty_i      (wb_s2m_ptc_rty),
+// Synthesizer 
+    .wb_wavesynth_adr_o      (wb_m2s_wavesynth_adr),
+    .wb_wavesynth_dat_o      (wb_m2s_wavesynth_dat),
+    .wb_wavesynth_sel_o      (wb_m2s_wavesynth_sel),
+    .wb_wavesynth_we_o       (wb_m2s_wavesynth_we),
+    .wb_wavesynth_cyc_o      (wb_m2s_wavesynth_cyc),
+    .wb_wavesynth_stb_o      (wb_m2s_wavesynth_stb),
+    .wb_wavesynth_cti_o      (wb_m2s_wavesynth_cti),
+    .wb_wavesynth_bte_o      (wb_m2s_wavesynth_bte),
+    .wb_wavesynth_dat_i      (wb_s2m_wavesynth_dat),
+    .wb_wavesynth_ack_i      (wb_s2m_wavesynth_ack),
+    .wb_wavesynth_err_i      (wb_s2m_wavesynth_err),
+    .wb_wavesynth_rty_i      (wb_s2m_wavesynth_rty),
 // SPI
     .wb_spi_accel_adr_o (wb_m2s_spi_accel_adr),
     .wb_spi_accel_dat_o (wb_m2s_spi_accel_dat),

@@ -80,6 +80,8 @@ module swervolf_core
     inout wire [31:0]  io_data,
     output wire [ 7          :0] AN,
     output wire [ 6          :0] Digits_Bits,
+    output wire        o_sd_audio,
+    output wire        o_pwm_audio,
     output wire        o_accel_sclk,
     output wire        o_accel_cs_n,
     output wire        o_accel_mosi,
@@ -403,7 +405,29 @@ module swervolf_core
       .miso_i (i_accel_miso));
 
 
+   // Eleonora Chacon: here comes the wavetable synth
+   wavetable_top wavesynth0 (
+      .i_clk            (clk),
+      .i_reset          (wb_rst),
+      .i_wb_addr        (wb_m2s_wavesynth_adr[5:0]),
+      .i_wb_data        (wb_m2s_wavesynth_dat),
+    //.i_wb_sel         (wb_m2s_wavesynth_sel),
+      .i_wb_we          (wb_m2s_wavesynth_we),
+      .i_wb_cyc         (wb_m2s_wavesynth_cyc),
+      .i_wb_stb         (wb_m2s_wavesynth_stb),
+    //.i_wb_cti         (wb_m2s_wavesynth_cti),
+    //.i_wb_bte         (wb_m2s_wavesynth_bte),
+      .o_wb_data        (wb_s2m_wavesynth_dat),
+      .o_wb_ack         (wb_s2m_wavesynth_ack),
+    //.o_wb_err         (wb_s2m_wavesynth_err),
+    //.o_wb_rty         (wb_s2m_wavesynth_rty),
+    //.o_wb_stall       ()
+      .o_pwm            (o_pwm_audio),
+      .o_aux            (),
+      .o_int            ());
 
+   assign o_sd_audio = 1'b1;
+   
    swerv_wrapper_dmi swerv_eh1
      (
       .clk     (clk),

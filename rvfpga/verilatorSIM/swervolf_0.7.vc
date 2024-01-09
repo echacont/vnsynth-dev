@@ -18,6 +18,8 @@
 -CFLAGS -I../src/SweRVolfSoC/Peripherals/ptc
 +incdir+../src/SweRVolfSoC/Peripherals/gpio
 -CFLAGS -I../src/SweRVolfSoC/Peripherals/gpio
++incdir+../src/SweRVolfSoC/Peripherals/wavetable
+-CFLAGS -I../src/SweRVolfSoC/Peripherals/wavetable
 +incdir+../src/SweRVolfSoC/Interconnect/WishboneInterconnect/wb_common_1.0.3
 -CFLAGS -I../src/SweRVolfSoC/Interconnect/WishboneInterconnect/wb_common_1.0.3
 +incdir+../src/SweRVolfSoC/Interconnect/WishboneInterconnect
@@ -140,6 +142,8 @@
 ../src/OtherSources/pulp-platform.org__common_cells_1.20.0/src/deprecated/fifo_v1.sv
 ../src/OtherSources/pulp-platform.org__common_cells_1.20.0/src/edge_propagator.sv
 ../src/OtherSources/pulp-platform.org__common_cells_1.20.0/src/edge_propagator_rx.sv
+
+../src/SweRVolfSoC/Peripherals/wavetable/wavetable_top.v
 
 ../src/SweRVolfSoC/Peripherals/spi/fifo4.v
 ../src/SweRVolfSoC/Peripherals/spi/simple_spi_top.v
