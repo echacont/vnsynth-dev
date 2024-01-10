@@ -422,9 +422,7 @@ module swervolf_core
     //.o_wb_err         (wb_s2m_wavesynth_err),
     //.o_wb_rty         (wb_s2m_wavesynth_rty),
     //.o_wb_stall       ()
-      .o_pwm            (o_pwm_audio),
-      .o_aux            (),
-      .o_int            ());
+      .o_pdm            (o_pwm_audio));
 
    assign o_sd_audio = 1'b1;
    

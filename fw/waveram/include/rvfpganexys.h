@@ -30,9 +30,10 @@
 #define Select_INT      0x80001018
 
 // Wavetable 
-#define SYNTH_CTRL      0x80001600
+#define SYNTH_RAM_RW    0x80001600
 #define SYNTH_ADDR      0x80001604
 #define SYNTH_DATA      0x80001608
+#define SYNTH_CTRL      0x8000160C
 
 // Wishbone bus 32-bit register access macros
 #define READ_REG(dir) (*(volatile unsigned *)dir)
