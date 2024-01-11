@@ -41,7 +41,8 @@ module wavetable_top (
                     wram_en   <= 1;
                 end
                 // wavetable ram address
-                1: wram_addr <= i_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0];
+                // logic was moved below
+                //1: wram_addr <= i_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0];
                 // wavetable ram data in
                 2: wram_di   <= i_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0];
                 // synthesis control
@@ -49,6 +50,13 @@ module wavetable_top (
                     stop_synth  <= i_wb_data[1];
                     start_synth  <= i_wb_data[0];
                 end
+                // synthesis wave sample lenght
+                4: wram_length <= i_wb_data[11:0];
+                // synthesis: pdmaudio reload timer
+                5: begin
+                   pdm_timer <= i_wb_data[15:0]; 
+                end
+
             endcase
 
         // Wishbone read address decoder
@@ -61,8 +69,6 @@ module wavetable_top (
                 // wavetable ram data out
                 2: o_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0] <= wram_dout;
             endcase
-            
-
     end
 
     // Wavetable RAM signals
@@ -76,9 +82,26 @@ module wavetable_top (
     wire  wram_en_or;
     reg  [`WAVE_BRAM_DATA_WIDTH-1:0]  wram_di = 0;
     reg  [`WAVE_BRAM_ADDR_WIDTH-1:0]  wram_addr = 0;
+    reg  [11:0] wram_length = `WAVE_CYCLE_LENGTH;
+    reg  inc_wram_addr = 0;
+    reg  reset_wram_addr = 0;
 
-    assign next_wram_addr = wram_addr+1;
+    assign next_wram_addr = wram_addr + 1;
     assign wram_en_or = wram_en | wram_en_read;
+
+    // wram address logic
+    always @(posedge i_clk) begin
+        // wishbone write addressing wram_addr register
+        if (reg_we & (i_wb_addr[5:2] == 1)) 
+            wram_addr <= i_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0];
+        // pdmaudio operation requires the next sample
+        else if (inc_wram_addr) begin
+            if (next_wram_addr < wram_length) wram_addr <= next_wram_addr;
+            else wram_addr <= 0;
+        end
+        else if (reset_wram_addr) wram_addr <= 0;
+        else wram_addr <= wram_addr;
+    end
 
     // BRAM instance
     rams_sp_nc wave_bram0 (
@@ -103,14 +126,17 @@ module wavetable_top (
     reg pdm_we   = 0;
     reg pdm_addr = 0;
     reg [`WAVE_PDM_DATA_WIDTH-1:0] pdm_data = 0;
-    wire [15:0] pdm_timer; 
-    assign pdm_timer = 16'd1133;
+    reg [15:0] pdm_timer = 16'd1133;
+    reg pdm_timer_update = 0;
+    wire pdm_reset_w;
+    assign pdm_reset_w = i_reset | pdm_reset;
 
     // main synthesis FSM
     // Enables PDM engine and controls wavetable RAM pointers
     always @(posedge i_clk) begin
         pdm_reset <= 0;
         audio_en <= 0;
+        reset_wram_addr <= 0;
         case (synth_state)
             // Idle (no synthesis, silence, off)
             `SYNTH_FSM_IDLE: begin
@@ -125,7 +151,7 @@ module wavetable_top (
             end
             // setup (reset wram address pointer)
             `SYNTH_FSM_SETUP: begin
-                wram_addr <= 0;
+                reset_wram_addr <= 1;
                 // wait until PDM audio is ready
                 if (next_pdm_state == `PDM_FSM_IDLE) 
                     next_synth_state <= `SYNTH_FSM_AUDIO;
@@ -146,6 +172,7 @@ module wavetable_top (
     // Controls operation of PDM audio engine
     always @(posedge i_clk) begin
         wram_en_read <= 0;
+        inc_wram_addr <= 0;
         case (pdm_state)
             // Idle
             `PDM_FSM_IDLE: begin
@@ -182,9 +209,8 @@ module wavetable_top (
                 // wait until pwmaudio acks 
                 // set next wram address
                 // if setup, we also need to write reload timer
-                // FIXME condition can also be true if pitch change is needed (future)
                 if (pdm_ack) begin
-                    if (next_synth_state == `SYNTH_FSM_SETUP)  begin
+                    if ((next_synth_state == `SYNTH_FSM_SETUP) | pdm_timer_update)  begin
                         pdm_cyc  <= 1;
                         pdm_we   <= 1;
                         pdm_addr <= 1;
@@ -198,7 +224,7 @@ module wavetable_top (
                         pdm_we    <= 0;
                         next_pdm_state <= `PDM_FSM_IDLE;
                     end
-                    wram_addr <= next_wram_addr;
+                    inc_wram_addr <= 1;
                 end
                 else  next_pdm_state <= `PDM_FSM_WRITE_SAMPLE;
             end
@@ -233,7 +259,7 @@ module wavetable_top (
 
     wbpdmaudio_mod pdmaudio0 (
         .i_clk      (pdm_clk),
-        .i_reset    (pdm_reset),
+        .i_reset    (pdm_reset_w),
         .i_wb_cyc   (pdm_cyc),
         .i_wb_stb   (pdm_cyc),
         .i_wb_we    (pdm_we),
@@ -241,9 +267,8 @@ module wavetable_top (
         .i_wb_data  (pdm_data),
         .o_wb_ack   (pdm_ack),
         .o_wb_data  (pdm_data_out),
-        .o_pwm      (o_pdm),
+        .o_pdm      (o_pdm),
         .o_int      (pdm_int));
-
 
 endmodule
 
@@ -275,7 +300,6 @@ begin
 end
 endmodule
 
-
 // reusing code from Dan Gisselquist's wbpwmaudio controller
 // with some fixes due to bug related to i_wb_cyc and how data is passed to
 // the pulse density modulator, which was itself replaced with 
@@ -285,7 +309,7 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 		// Wishbone interface
 		i_wb_cyc, i_wb_stb, i_wb_we, i_wb_addr, i_wb_data,
 			o_wb_ack, o_wb_stall, o_wb_data,
-		o_pwm, o_aux, o_int);
+		o_pdm, o_aux, o_int);
 	parameter DEFAULT_RELOAD = 16'd1133,  // about 44.1 kHz @ 50 MHz
             //DEFAULT_RELOAD = 16'd1814, // about 44.1 kHz @  80MHz
 			//DEFAULT_RELOAD = 16'd2268,//about 44.1 kHz @ 100MHz
@@ -299,8 +323,7 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 	output	reg		o_wb_ack;
 	output	wire		o_wb_stall;
 	output	wire	[31:0]	o_wb_data;
-    // Eleonora Chacon: changing this output to open drain wire
-	output	wire		o_pwm;
+	output	wire		o_pdm;
 	output	reg	[(NAUX-1):0]	o_aux;
 	output	wire		o_int;
 
@@ -355,7 +378,6 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 		if (ztimer)
 			sample_out <= next_sample;
 
-
 	//
 	// Control what's in the single sample buffer, next_sample, as well as
 	// whether or not it's a valid sample.  Specifically, if next_valid is
@@ -367,15 +389,14 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 	initial	next_valid = 1'b1;
 	initial	next_sample = 16'h8000;
 	always @(posedge i_clk) // Data write
-        // Eleonora CHacon: adding i_wb_cyc to this condition
+        // Eleonora Chacon: adding i_wb_cyc to this condition
 		if ((i_wb_stb)&&(i_wb_we)&&(i_wb_cyc)
 				&&((!i_wb_addr)||(VARIABLE_RATE==0)))
 		begin
 			// Write with two's complement data, convert it
 			// internally to an unsigned binary offset
 			// representation
-            // Eleonora Chacon: pasando dato intacto a PDM
-			next_sample <=  i_wb_data[15:0] ;
+            next_sample <= { !i_wb_data[15], i_wb_data[14:0] };
 			next_valid <= 1'b1;
 		end else if (ztimer)
 			next_valid <= 1'b0;
@@ -385,7 +406,6 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 	// This output can also be used to control a read from a FIFO as well,
 	// depending on how you wish to use the core.
 	assign	o_int = (!next_valid);
-
 
     // Eleonora Chacon
     // To generate our waveform, I will use a different PDM method
@@ -399,9 +419,9 @@ module	wbpdmaudio_mod (i_clk, i_reset,
         .dout   (pdm_out),
         .error  ());
 
-    assign o_pwm = ~pdm_out ? 1'b0 : 1'bz;
+    //assign o_pdm = ~pdm_out ? 1'b0 : 1'bz;
+    assign o_pdm = pdm_out;
 
-	//
 	// Handle the bus return traffic.
 	generate
 	if (VARIABLE_RATE == 0)
@@ -445,7 +465,6 @@ module	wbpdmaudio_mod (i_clk, i_reset,
 
 endmodule
 
-
 // Pulse Density Modulation code taken from
 // https://www.koheron.com/blog/2016/09/27/pulse-density-modulation
 module pdm #(parameter NBITS = 16)
@@ -483,4 +502,3 @@ module pdm #(parameter NBITS = 16)
   end
 
 endmodule
-

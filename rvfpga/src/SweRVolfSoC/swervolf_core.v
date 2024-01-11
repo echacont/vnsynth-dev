@@ -422,7 +422,14 @@ module swervolf_core
     //.o_wb_err         (wb_s2m_wavesynth_err),
     //.o_wb_rty         (wb_s2m_wavesynth_rty),
     //.o_wb_stall       ()
-      .o_pdm            (o_pwm_audio));
+      .o_pdm            (pdm_audio));
+
+   wire pdm_audio;
+
+   tristates_2 out_buffer0 (
+       .T   (pdm_audio),        // output goes hi-Z when input is high
+       .I   (1'b0),             // output goes low when input is low
+       .O   (o_pwm_audio));     // open drain output
 
    assign o_sd_audio = 1'b1;
    
@@ -660,3 +667,13 @@ assign bidir = oe ? inp : 1'bZ ;
 assign outp  = bidir;
 
 endmodule
+
+// OUTPUT TRI-STATE BUFFER FOR PDM AUDIO
+module tristates_2 (T, I, O);
+    input  wire T; 
+    input  wire I;
+    output wire O;
+
+    assign O = (~T) ? I: 1'bZ; 
+
+endmodule 

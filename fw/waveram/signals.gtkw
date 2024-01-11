@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Jan 10 16:11:59 2024
+[*] Wed Jan 10 18:41:24 2024
 [*]
 [dumpfile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/.pio/build/swervolf_nexys/trace.vcd"
-[dumpfile_mtime] "Wed Jan 10 16:10:22 2024"
-[dumpfile_size] 282647806
+[dumpfile_mtime] "Wed Jan 10 18:37:36 2024"
+[dumpfile_size] 568941155
 [savefile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/signals.gtkw"
 [timestart] 0
-[size] 1187 844
+[size] 1815 850
 [pos] -1 -1
-*-17.170286 212310 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.709913 1167280 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfpgasim.
 [treeopen] rvfpgasim.swervolf.
 [treeopen] rvfpgasim.swervolf.wavesynth0.
@@ -17,7 +17,7 @@
 [sst_width] 214
 [signals_width] 243
 [sst_expanded] 1
-[sst_vpaned_height] 329
+[sst_vpaned_height] 330
 @28
 rvfpgasim.swervolf.wavesynth0.i_clk
 rvfpgasim.swervolf.wavesynth0.i_reset
@@ -43,9 +43,7 @@ rvfpgasim.swervolf.wavesynth0.pdm_state[1:0]
 @28
 rvfpgasim.swervolf.wavesynth0.pdm_reset
 rvfpgasim.swervolf.wavesynth0.pdm_clk
-@29
 rvfpgasim.swervolf.wavesynth0.pdm_int
-@28
 rvfpgasim.swervolf.wavesynth0.pdm_ack
 rvfpgasim.swervolf.wavesynth0.pdm_cyc
 rvfpgasim.swervolf.wavesynth0.pdm_addr
@@ -56,7 +54,8 @@ rvfpgasim.swervolf.wavesynth0.pdm_data[15:0]
 @28
 rvfpgasim.swervolf.wavesynth0.wram_en_or
 rvfpgasim.swervolf.wavesynth0.wram_we
-@c00022
+@c00023
+[color] 2
 rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
 @28
 (0)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
@@ -70,11 +69,12 @@ rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
 (8)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
 (9)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
 (10)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-@1401200
+@1401201
 -group_end
 @22
 rvfpgasim.swervolf.wavesynth0.wram_di[15:0]
 rvfpgasim.swervolf.wavesynth0.wram_dout[15:0]
+rvfpgasim.swervolf.wavesynth0.wram_length[11:0]
 @200
 -
 @22

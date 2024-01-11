@@ -1,2 +1,7 @@
 vivado/
+!vivado/*/*.xpr
 verilatorSIM/
+!verilatorSIM/Makefile
+!verilatorSIM/package.json
+!verilatorSIM/swervolf_0.7.vc
+!verilatorSIM/tb.cpp
