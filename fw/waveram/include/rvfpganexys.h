@@ -36,6 +36,7 @@
 #define SYNTH_CTRL      0x8000160C
 #define SYNTH_CYCLE     0x80001610
 #define SYNTH_TIMER     0x80001614
+#define SYNTH_WAVEPOS   0x80001618
 
 // Wishbone bus 32-bit register access macros
 #define READ_REG(dir) (*(volatile unsigned *)dir)

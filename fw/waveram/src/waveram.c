@@ -18,25 +18,50 @@ int main (void)
     int initial_n = 0; 
     for (int i = initial_n; i < lenght+initial_n; i++)
     {
-      WRITE_REG(SYNTH_ADDR, i-initial_n);
+      WRITE_REG(SYNTH_ADDR, i);
       //WRITE_REG(SYNTH_DATA, calc_wave(i))
-      WRITE_REG(SYNTH_DATA, data16[i])
+      WRITE_REG(SYNTH_DATA, data16[i-initial_n])
       WRITE_REG(SYNTH_RAM_RW, 1);
     }
-    
-    //WRITE_REG(SYNTH_CYCLE, 22);
-    //WRITE_REG(SYNTH_TIMER, 1000);
+    initial_n = 512;
+    for (int i = initial_n; i < lenght+initial_n; i++)
+    {
+      WRITE_REG(SYNTH_ADDR, i);
+      //WRITE_REG(SYNTH_DATA, calc_wave(i))
+      WRITE_REG(SYNTH_DATA, data[i-initial_n])
+      WRITE_REG(SYNTH_RAM_RW, 1);
+    }
+
+    WRITE_REG(SYNTH_CYCLE, 44);
+    WRITE_REG(SYNTH_TIMER, 500);
 
     // enable audio
     WRITE_REG(SYNTH_CTRL, 1);
     
-    //volatile int t = 0;
-    //for (int i = 0; i < 1000; i++)
-    //  t++;
+    while (1) {
+      volatile int t = 0;
+      for (int i = 0; i < 50000; i++)
+        t++;
 
-    //WRITE_REG(SYNTH_TIMER, 500);
+      WRITE_REG(SYNTH_TIMER, 800);
+      WRITE_REG(SYNTH_WAVEPOS, 1);
+      
+      //WRITE_REG(SYNTH_WAVEPOS, 1);
+   
+      for (int i = 0; i < 50000; i++)
+        t++;
+      
+      WRITE_REG(SYNTH_TIMER, 500);
+      WRITE_REG(SYNTH_WAVEPOS, 0);
+    }
+
     // disable audio
-    //WRITE_REG(SYNTH_CTRL, 2);
+    WRITE_REG(SYNTH_CTRL, 2);
+
+    //for (int i = 0; i < 10; i++)
+    //  t++;   
+    //enable audio
+    //WRITE_REG(SYNTH_CTRL, 1);*/
 
 
 }

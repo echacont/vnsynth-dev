@@ -22,13 +22,16 @@ module wavetable_top (
     wire reg_we = i_wb_cyc & i_wb_stb & i_wb_we & !o_wb_ack;
     
     always @(posedge i_clk) begin
+        // Always acknowledge
+        o_wb_ack <= i_wb_cyc & !o_wb_ack;
 
-        o_wb_ack <= i_wb_cyc & !o_wb_ack; // Always acknowledge
-        // these signals need to be only a pulse
+        // when set by logic, these signals need to be only a pulse
         wram_we <= 0;
         wram_en <= 0;
         stop_synth <= 0;
         start_synth <= 0;
+        pdm_timer_update <= 0;
+        wram_pos_update <= 0;
 
         // Wishbone write address decoder
         // FIXME: there is potential bug:
@@ -54,9 +57,14 @@ module wavetable_top (
                 4: wram_length <= i_wb_data[11:0];
                 // synthesis: pdmaudio reload timer
                 5: begin
-                   pdm_timer <= i_wb_data[15:0]; 
+                   pdm_timer <= i_wb_data[15:0];
+                   pdm_timer_update <= 1;
+               end
+                // synthesis: wram wave position
+                6: begin
+                    wram_pos <= i_wb_data[`WAVE_BRAM_POS_WIDTH-1:0];
+                    wram_pos_update <= 1;
                 end
-
             endcase
 
         // Wishbone read address decoder
@@ -74,6 +82,8 @@ module wavetable_top (
     // Wavetable RAM signals
     wire [`WAVE_BRAM_DATA_WIDTH-1:0]  wram_dout;
     wire [`WAVE_BRAM_ADDR_WIDTH-1:0]  next_wram_addr;
+    wire [`WAVE_BRAM_ADDR_WIDTH-1:0]  pos_wram_addr;
+    wire [`WAVE_BRAM_ADDR_WIDTH-1:0]  max_wram_addr;
     
     // registers
     reg   wram_we = 0;
@@ -85,21 +95,27 @@ module wavetable_top (
     reg  [11:0] wram_length = `WAVE_CYCLE_LENGTH;
     reg  inc_wram_addr = 0;
     reg  reset_wram_addr = 0;
-
-    assign next_wram_addr = wram_addr + 1;
-    assign wram_en_or = wram_en | wram_en_read;
+    reg  [`WAVE_BRAM_POS_WIDTH-1:0] wram_pos = 0;
+    reg  wram_pos_update = 0;
 
     // wram address logic
+    assign wram_en_or = wram_en | wram_en_read;
+    assign next_wram_addr = wram_addr + 1;
+    assign pos_wram_addr = wram_pos * `WAVE_CYCLE_LENGTH;
+    assign max_wram_addr = wram_length + pos_wram_addr;
+
+    // wram address control logic
     always @(posedge i_clk) begin
         // wishbone write addressing wram_addr register
         if (reg_we & (i_wb_addr[5:2] == 1)) 
             wram_addr <= i_wb_data[`WAVE_BRAM_DATA_WIDTH-1:0];
         // pdmaudio operation requires the next sample
         else if (inc_wram_addr) begin
-            if (next_wram_addr < wram_length) wram_addr <= next_wram_addr;
-            else wram_addr <= 0;
+            if (next_wram_addr < max_wram_addr) wram_addr <= next_wram_addr;
+            else wram_addr <= pos_wram_addr;
         end
-        else if (reset_wram_addr) wram_addr <= 0;
+        else if (reset_wram_addr) wram_addr <= pos_wram_addr;
+        else if (wram_pos_update) wram_addr <= wram_addr + pos_wram_addr;
         else wram_addr <= wram_addr;
     end
 
@@ -128,6 +144,7 @@ module wavetable_top (
     reg [`WAVE_PDM_DATA_WIDTH-1:0] pdm_data = 0;
     reg [15:0] pdm_timer = 16'd1133;
     reg pdm_timer_update = 0;
+    reg pdm_timer_sticky = 0;
     wire pdm_reset_w;
     assign pdm_reset_w = i_reset | pdm_reset;
 
@@ -136,7 +153,6 @@ module wavetable_top (
     always @(posedge i_clk) begin
         pdm_reset <= 0;
         audio_en <= 0;
-        reset_wram_addr <= 0;
         case (synth_state)
             // Idle (no synthesis, silence, off)
             `SYNTH_FSM_IDLE: begin
@@ -151,7 +167,6 @@ module wavetable_top (
             end
             // setup (reset wram address pointer)
             `SYNTH_FSM_SETUP: begin
-                reset_wram_addr <= 1;
                 // wait until PDM audio is ready
                 if (next_pdm_state == `PDM_FSM_IDLE) 
                     next_synth_state <= `SYNTH_FSM_AUDIO;
@@ -173,6 +188,9 @@ module wavetable_top (
     always @(posedge i_clk) begin
         wram_en_read <= 0;
         inc_wram_addr <= 0;
+        reset_wram_addr <= 0;
+        if (pdm_timer_update) pdm_timer_sticky <= 1;
+
         case (pdm_state)
             // Idle
             `PDM_FSM_IDLE: begin
@@ -180,11 +198,16 @@ module wavetable_top (
                 pdm_we   <= 0;
                 pdm_addr <= 0;
                 // synth is initializing
-                // or pdm engine needs a new sample
-                // prepare inputs to reload pwmaudio registers
                 // signal read to wave ram using current wram address
-                if ((next_synth_state == `SYNTH_FSM_SETUP) | (pdm_int & audio_en)) begin
-                    wram_en_read <= 1;
+                if (next_synth_state == `SYNTH_FSM_SETUP) begin
+                    reset_wram_addr <= 1;
+                    wram_en_read  <= 1;                    
+                    next_pdm_state <= `PDM_FSM_READ_SAMPLE;
+                end
+                // or pdm engine needs a new sample
+                // if wave position control changed, need to reset wram address
+                else if (pdm_int & audio_en) begin
+                    wram_en_read  <= 1;                    
                     next_pdm_state <= `PDM_FSM_READ_SAMPLE;
                 end
                 // nothing to do
@@ -193,8 +216,8 @@ module wavetable_top (
             // Read sample from wavetable RAM
             // prepare inputs to pwm audio
             `PDM_FSM_READ_SAMPLE: begin
-                // wait until cycle is complete, 
-                // move wram read data out to pdm_data bus
+                // wait until read cycle is complete, 
+                // move wram data out to pdm_data bus
                 // and prepare inputs to pdmaudio
                 if (~wram_en_read) begin
                     pdm_data  <= wram_dout;
@@ -210,7 +233,7 @@ module wavetable_top (
                 // set next wram address
                 // if setup, we also need to write reload timer
                 if (pdm_ack) begin
-                    if ((next_synth_state == `SYNTH_FSM_SETUP) | pdm_timer_update)  begin
+                    if ((next_synth_state == `SYNTH_FSM_SETUP) | pdm_timer_sticky)  begin
                         pdm_cyc  <= 1;
                         pdm_we   <= 1;
                         pdm_addr <= 1;
@@ -236,6 +259,7 @@ module wavetable_top (
                     pdm_we   <= 0;
                     pdm_addr <= 0;
                     wram_en_read  <= 1;
+                    pdm_timer_sticky <= 0;
                     next_pdm_state <= `PDM_FSM_IDLE;
                 end
                 else next_pdm_state <= `PDM_FSM_WRITE_RELOAD;
@@ -275,7 +299,6 @@ endmodule
 // elecha: using example code from Xilinx:
 // Single-Port Block RAM No-Change Mode
 // File: rams_sp_nc.v
-
 module rams_sp_nc (clk, we, en, addr, di, dout);
 
 input clk; 

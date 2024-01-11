@@ -1,23 +1,23 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Jan 10 18:41:24 2024
+[*] Thu Jan 11 19:28:40 2024
 [*]
 [dumpfile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/.pio/build/swervolf_nexys/trace.vcd"
-[dumpfile_mtime] "Wed Jan 10 18:37:36 2024"
-[dumpfile_size] 568941155
+[dumpfile_mtime] "Thu Jan 11 19:28:15 2024"
+[dumpfile_size] 252809424
 [savefile] "/home/elecha/Digitales/work/vnsynth-dev/fw/waveram/signals.gtkw"
 [timestart] 0
-[size] 1815 850
+[size] 1724 889
 [pos] -1 -1
-*-17.709913 1167280 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.035542 782300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfpgasim.
 [treeopen] rvfpgasim.swervolf.
 [treeopen] rvfpgasim.swervolf.wavesynth0.
 [treeopen] rvfpgasim.swervolf.wavesynth0.pdmaudio0.
 [sst_width] 214
-[signals_width] 243
+[signals_width] 267
 [sst_expanded] 1
-[sst_vpaned_height] 330
+[sst_vpaned_height] 534
 @28
 rvfpgasim.swervolf.wavesynth0.i_clk
 rvfpgasim.swervolf.wavesynth0.i_reset
@@ -32,6 +32,7 @@ rvfpgasim.swervolf.wavesynth0.i_wb_data[31:0]
 rvfpgasim.swervolf.wavesynth0.start_synth
 rvfpgasim.swervolf.wavesynth0.stop_synth
 rvfpgasim.swervolf.wavesynth0.audio_en
+rvfpgasim.swervolf.wavesynth0.next_synth_state[1:0]
 rvfpgasim.swervolf.wavesynth0.synth_state[1:0]
 @c00028
 rvfpgasim.swervolf.wavesynth0.pdm_state[1:0]
@@ -42,46 +43,42 @@ rvfpgasim.swervolf.wavesynth0.pdm_state[1:0]
 -group_end
 @28
 rvfpgasim.swervolf.wavesynth0.pdm_reset
+rvfpgasim.swervolf.wavesynth0.pdm_reset_w
+rvfpgasim.swervolf.wavesynth0.pdm_timer_update
+rvfpgasim.swervolf.wavesynth0.pdm_timer_sticky
+[color] 2
+rvfpgasim.swervolf.wavesynth0.wram_pos_update
+@22
+rvfpgasim.swervolf.wavesynth0.wram_pos[5:0]
+@28
 rvfpgasim.swervolf.wavesynth0.pdm_clk
 rvfpgasim.swervolf.wavesynth0.pdm_int
 rvfpgasim.swervolf.wavesynth0.pdm_ack
 rvfpgasim.swervolf.wavesynth0.pdm_cyc
 rvfpgasim.swervolf.wavesynth0.pdm_addr
 @22
+rvfpgasim.swervolf.wavesynth0.pdm_timer[15:0]
 rvfpgasim.swervolf.wavesynth0.pdm_data[15:0]
+[color] 7
+rvfpgasim.swervolf.wavesynth0.pdmaudio0.w_reload_value[15:0]
+[color] 7
+rvfpgasim.swervolf.wavesynth0.pdmaudio0.next_sample[15:0]
+@28
+[color] 7
+rvfpgasim.swervolf.wavesynth0.o_pdm
 @200
 -
 @28
 rvfpgasim.swervolf.wavesynth0.wram_en_or
 rvfpgasim.swervolf.wavesynth0.wram_we
-@c00023
-[color] 2
-rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-@28
-(0)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(1)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(2)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(3)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(4)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(5)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(6)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(7)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(8)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(9)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-(10)rvfpgasim.swervolf.wavesynth0.wram_addr[10:0]
-@1401201
--group_end
+rvfpgasim.swervolf.wavesynth0.reset_wram_addr
+rvfpgasim.swervolf.wavesynth0.inc_wram_addr
 @22
 rvfpgasim.swervolf.wavesynth0.wram_di[15:0]
-rvfpgasim.swervolf.wavesynth0.wram_dout[15:0]
-rvfpgasim.swervolf.wavesynth0.wram_length[11:0]
-@200
--
+@23
+rvfpgasim.swervolf.wavesynth0.wram_addr[14:0]
 @22
-rvfpgasim.swervolf.wavesynth0.pdmaudio0.next_sample[15:0]
-rvfpgasim.swervolf.wavesynth0.pdmaudio0.timer[15:0]
-@28
-rvfpgasim.swervolf.wavesynth0.o_pdm
-rvfpgasim.swervolf.wavesynth0.pdmaudio0.pdm_out
+rvfpgasim.swervolf.wavesynth0.wram_length[11:0]
+rvfpgasim.swervolf.wavesynth0.wram_pos[5:0]
 [pattern_trace] 1
 [pattern_trace] 0
