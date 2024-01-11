@@ -2,49 +2,34 @@
 // waveram.c  wavetable ram test program
 
 #include "rvfpganexys.h"
-#include "data.h"
-#include <math.h>
-
-// wavetable stuff
-#define N 44        // number of samples per wave
-#define D 65535     // sample bit-depth (2^16-1)
-
-int calc_wave(int n);
+#include "wave2.h"
 
 int main (void)
 {
 
     int lenght = N;
-    int initial_n = 0; 
-    for (int i = initial_n; i < lenght+initial_n; i++)
+    for (int i = 0; i < lenght; i++)
     {
       WRITE_REG(SYNTH_ADDR, i);
-      //WRITE_REG(SYNTH_DATA, calc_wave(i))
-      WRITE_REG(SYNTH_DATA, data16[i-initial_n])
-      WRITE_REG(SYNTH_RAM_RW, 1);
-    }
-    initial_n = 512;
-    for (int i = initial_n; i < lenght+initial_n; i++)
-    {
-      WRITE_REG(SYNTH_ADDR, i);
-      //WRITE_REG(SYNTH_DATA, calc_wave(i))
-      WRITE_REG(SYNTH_DATA, data[i-initial_n])
+      WRITE_REG(SYNTH_DATA, wave2[i])
       WRITE_REG(SYNTH_RAM_RW, 1);
     }
 
-    WRITE_REG(SYNTH_CYCLE, 44);
+    WRITE_REG(SYNTH_CYCLE, 512);
     WRITE_REG(SYNTH_TIMER, 500);
 
     // enable audio
     WRITE_REG(SYNTH_CTRL, 1);
     
+    volatile int t = 0;
+
     while (1) {
-      volatile int t = 0;
+      
       for (int i = 0; i < 50000; i++)
         t++;
 
-      WRITE_REG(SYNTH_TIMER, 800);
-      WRITE_REG(SYNTH_WAVEPOS, 1);
+      WRITE_REG(SYNTH_TIMER, 1000);
+      // WRITE_REG(SYNTH_WAVEPOS, 1);
       
       //WRITE_REG(SYNTH_WAVEPOS, 1);
    
@@ -52,7 +37,7 @@ int main (void)
         t++;
       
       WRITE_REG(SYNTH_TIMER, 500);
-      WRITE_REG(SYNTH_WAVEPOS, 0);
+      //WRITE_REG(SYNTH_WAVEPOS, 0);
     }
 
     // disable audio
@@ -63,11 +48,4 @@ int main (void)
     //enable audio
     //WRITE_REG(SYNTH_CTRL, 1);*/
 
-
-}
-
-
-int calc_wave(int n)
-{
-  return round(D*sin(2*M_PI*n/N));
 }
